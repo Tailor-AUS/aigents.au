@@ -1,0 +1,46 @@
+{
+  "company": {
+    "name": "Macmahon",
+    "slug": "macmahon",
+    "industry": "Surface Mining & Heavy Equipment Infrastructure",
+    "mission": "Delivering leading end-to-end mining and civil contracting services with high-reliability mobile fleets and advanced dispatch optimization.",
+    "strategicPriorities": [
+      "Heavy Mobile Equipment Reliability & Health Telemetry",
+      "Fleet Dispatch Optimization & Mine Planning",
+      "Operational Bottleneck Reduction across WA Surface Mines"
+    ]
+  },
+  "role": {
+    "title": "Vacation Student Engineer (Mechanical / Mining)",
+    "department": "Mobile Equipment Maintenance & Fleet Reliability",
+    "level": "Paid Summer Vacation Program (10–12 Weeks)",
+    "location": "Perth WA & Regional WA Surface Mining Operations",
+    "duration": "10–12 Week Paid Summer Sprint (Commencing Nov 2026)",
+    "overview": "Work alongside reliability engineers and maintenance superintendents to support mobile equipment maintenance, reliability data analysis, and plant health monitoring.",
+    "seekUrl": "https://au.seek.com/job/94567551",
+    "careersUrl": "https://www.macmahon.com.au/careers/"
+  },
+  "advertisedRequirements": [
+    "Currently enrolled in an undergraduate degree in Mechanical Engineering or Mining Engineering",
+    "Strong academic performance, analytical capability, and practical technical foundation",
+    "Excellent communication and teamwork capabilities with proactive curiosity",
+    "Willingness to undertake WA fly-in, fly-out (FIFO) site rotations"
+  ],
+  "identifiedOperationalBottlenecks": [
+    {
+      "requirement": "Mobile Fleet Sensor & Health Monitoring",
+      "teamStrain": "Maintenance teams are overloaded with dirty oil sample logs and temperature telemetry from 200+ heavy haul trucks.",
+      "complementaryWorkflow": "Automated Anomaly & Telemetry Parsing"
+    },
+    {
+      "requirement": "Equipment Reliability & Maintenance Logs",
+      "teamStrain": "Reliability engineers spend hours manually categorizing component failure modes across equipment shifts.",
+      "complementaryWorkflow": "Voice-to-Task & Project Controls Synthesis"
+    },
+    {
+      "requirement": "Mining Safety & Machine Guarding Compliance",
+      "teamStrain": "Cross-referencing statutory mine safety regulations and AS/NZS machinery standards creates delays in plant maintenance sign-offs.",
+      "complementaryWorkflow": "Sovereign Regulatory & Standards RAG"
+    }
+  ]
+}

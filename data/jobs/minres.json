@@ -1,0 +1,52 @@
+{
+  "company": {
+    "name": "Mineral Resources Limited",
+    "slug": "minres",
+    "industry": "Innovative Mining, Energy & Infrastructure (Autonomous Road Trains)",
+    "mission": "Delivering world-first industrial innovations including autonomous road trains, pit-to-port logistics automation, and next-generation lithium and iron ore processing.",
+    "strategicPriorities": [
+      "World-First Autonomous Road Train Deployment",
+      "Fleet Health & Predictive Maintenance Telemetry",
+      "Asset Reliability & Mechanical Engineering Automation"
+    ]
+  },
+  "role": {
+    "title": "Vacation Program Student — Mechanical & Automation Engineering",
+    "department": "Engineering & Innovation Projects",
+    "level": "Paid Summer Vacation Program (12 Weeks)",
+    "location": "Perth WA (NextGen HQ) & Site-Based Rotations",
+    "duration": "12-Week High-Impact Summer Sprint (Commencing Nov/Dec 2026)",
+    "overview": "Join MinRes's engineering innovation teams working on active capital projects, autonomous road trains, and high-tech processing plants to solve complex reliability and automation bottlenecks.",
+    "seekUrl": "https://au.seek.com/job/94573537",
+    "careersUrl": "https://careers.mineralresources.com.au/"
+  },
+  "advertisedRequirements": [
+    "Penultimate or final year student in Mechanical, Mechatronics, Systems, or Electrical Engineering",
+    "High academic achievement with strong analytical and mathematical problem-solving skills",
+    "Exposure to CAD, sensor telemetry, and mechanical reliability evaluation",
+    "Demonstrated drive, curiosity, and adaptability to work on mega-scale Australian industrial projects",
+    "Australian working rights and readiness to undertake WA site rotations"
+  ],
+  "identifiedOperationalBottlenecks": [
+    {
+      "requirement": "Autonomous Road Train & Fleet Telemetry",
+      "teamStrain": "Senior innovation engineers spend hours manually wrangling dirty vehicle CAN bus and sensor telemetry logs to troubleshoot autonomous vehicle faults.",
+      "complementaryWorkflow": "Automated Anomaly & Telemetry Parsing"
+    },
+    {
+      "requirement": "Mechanical Reliability & Failure Mode Modeling",
+      "teamStrain": "Updating FMEA matrices, asset reliability logs, and mechanical failure reports manually drains lead engineering capacity.",
+      "complementaryWorkflow": "Voice-to-Task & Project Controls Synthesis"
+    },
+    {
+      "requirement": "Australian Mining & Heavy Vehicle Standards Compliance",
+      "teamStrain": "Auditing autonomous haulage equipment against AS/NZS heavy vehicle and mining safety standards causes compliance review backlogs.",
+      "complementaryWorkflow": "Sovereign Regulatory & Standards RAG"
+    },
+    {
+      "requirement": "Simulation Scripting & Digital Twin Testing",
+      "teamStrain": "Writing repetitive parameter sweeps and kinematic simulation scripts for haul road dynamics slows down sprint releases.",
+      "complementaryWorkflow": "Agentic Code Loops & Digital Twins"
+    }
+  ]
+}

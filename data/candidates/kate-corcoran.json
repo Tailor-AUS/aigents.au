@@ -1,0 +1,69 @@
+{
+  "id": "kate-corcoran",
+  "name": "Kate Corcoran",
+  "title": "AI-Tooled Systems & Mechanical Engineer",
+  "tier": "ATAR 99.00",
+  "education": {
+    "degree": "Bachelor of Engineering (Honours)",
+    "discipline": "Mechanical & Systems Engineering",
+    "honours": "First Class Honours Track",
+    "academicHighlights": [
+      "ATAR 99.00 (Top 1% statewide academic rank)",
+      "Dean's Commendation for Academic Excellence",
+      "Advanced Engineering Mathematics & Physics Distinction"
+    ]
+  },
+  "valueProposition": "High-caliber quantitative horsepower paired with autonomous AI workflows to eliminate operational backlogs from Day 1.",
+  "aiWorkflowSuite": [
+    {
+      "category": "Telemetry & Data Pipelines",
+      "name": "Automated Anomaly & Telemetry Parsing",
+      "description": "Python + Polars data pipelines augmented with agentic anomaly detection to wrangle dirty sensor logs and time-series data without manual data cleaning drag.",
+      "tools": ["Python", "Polars", "Pandas", "DuckDB", "Agentic Pipelines"]
+    },
+    {
+      "category": "Standards & Compliance",
+      "name": "Sovereign Regulatory & Standards RAG",
+      "description": "Vectorised regulatory database over AS/NZS, ISO, and site-specific safety standards for instant clause retrieval, cross-referencing, and automated compliance auditing.",
+      "tools": ["Vector RAG", "Embedding Search", "Australian Standards (AS/NZS)", "ISO Standards"]
+    },
+    {
+      "category": "Simulation & Modeling",
+      "name": "Agentic Code Loops & Digital Twins",
+      "description": "AI-assisted parameter sweeps, finite element analysis (FEA) verification scripts, and automated test harness generation.",
+      "tools": ["MATLAB", "Python", "CAD Automation", "Automated Testing"]
+    },
+    {
+      "category": "Operational PMO & Reporting",
+      "name": "Voice-to-Task & Shift Handoff Synthesis",
+      "description": "Automated transcription and structured action-item extraction from technical discussions, auto-updating Jira/project risk registers.",
+      "tools": ["Whisper", "Structured JSON Extraction", "Project Controls", "HAZOP/FMEA Logs"]
+    }
+  ],
+  "technicalSkills": {
+    "languages": ["Python", "C++", "MATLAB", "SQL", "TypeScript"],
+    "engineeringTools": ["SolidWorks", "Simulink", "Finite Element Analysis (FEA)", "Git", "Docker"],
+    "aiTooling": ["Agentic LLM Loops", "RAG Workflows", "Vector Search", "Prompt Harnessing", "Function Calling"]
+  },
+  "proofProjects": [
+    {
+      "name": "Automated Heavy Asset Telemetry Parser",
+      "summary": "Engineered an agentic ingestion pipeline parsing 500k+ sensor data points per second, detecting thermal and vibration anomalies in heavy rotating machinery.",
+      "impact": "Reduced manual telemetry diagnostic time by 80%."
+    },
+    {
+      "name": "Australian Standards Compliance Assistant",
+      "summary": "Built a sovereign, local RAG retrieval system indexing heavy vehicle, mechanical safety, and pressure vessel standards to cite applicable clauses in seconds.",
+      "impact": "Turned a 4-hour manual standards review into a 2-minute verified report."
+    },
+    {
+      "name": "Automated Project Controls & Risk Register Engine",
+      "summary": "Created an AI workflow that parses engineering change requests (ECRs) and updates risk matrices (FMEA) with cross-team dependencies.",
+      "impact": "Eliminated 10+ hours per week of manual PMO administrative overhead."
+    }
+  ],
+  "contact": {
+    "availability": "Immediate / Vacation / Semester Sprint (Flexible 8–12 weeks)",
+    "location": "Brisbane / Gold Coast (Available for Travel / FIFO / Remote)"
+  }
+}

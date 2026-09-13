@@ -1,0 +1,47 @@
+{
+  "company": {
+    "name": "SunDrive",
+    "slug": "sundrive",
+    "industry": "Advanced Solar Manufacturing & Robotics",
+    "mission": "Pioneering the world's most efficient commercial-scale copper solar cell technology with automated precision manufacturing.",
+    "strategicPriorities": [
+      "Custom Automated Machinery & Robotic Validation Jigs",
+      "Precision Sensor, Motor & PLC Motion Control Integration",
+      "High-Speed Lab Automation & Continuous Equipment Optimization"
+    ]
+  },
+  "role": {
+    "title": "Junior Mechatronics Engineer",
+    "department": "Automation & Advanced Manufacturing R&D",
+    "level": "Junior / Graduate / Penultimate Undergrad Co-op",
+    "location": "Kurnell, Sydney NSW (On-site Lab & Workshop)",
+    "duration": "Full-time / Sprint Placement",
+    "overview": "Design, build, assemble, and test custom automated machinery, jigs, fixtures, and robotic validation systems for cutting-edge solar cell fabrication.",
+    "seekUrl": "https://au.seek.com/job/94126174",
+    "careersUrl": "https://sundrive.com/careers"
+  },
+  "advertisedRequirements": [
+    "Degree or near-completion in Mechatronics, Mechanical, Electrical, or Robotics Engineering",
+    "Hands-on experience with CAD (SolidWorks, Inventor, Fusion 360)",
+    "Practical aptitude in rapid prototyping, wiring, sensor integration, and microcontrollers/PLCs (STM32, Beckhoff, Siemens)",
+    "Programming proficiency in Python, C++, or structured text",
+    "Agility and problem-solving instincts in a fast-paced hardware R&D environment"
+  ],
+  "identifiedOperationalBottlenecks": [
+    {
+      "requirement": "Automated Fixture & Jig Rapid Prototyping",
+      "teamStrain": "Senior mechatronics engineers spend excessive time debugging test fixture control loops and writing repetitive driver code.",
+      "complementaryWorkflow": "Agentic Code Loops & Digital Twins"
+    },
+    {
+      "requirement": "Motion Control & Sensor Telemetry Logging",
+      "teamStrain": "Manual data extraction from automated fabrication rigs creates bottlenecks in cycle-time analysis.",
+      "complementaryWorkflow": "Automated Anomaly & Telemetry Parsing"
+    },
+    {
+      "requirement": "Testing Documentation & Hardware Risk Logs",
+      "teamStrain": "Documenting validation test protocols and compliance requirements diverts time from hardware assembly.",
+      "complementaryWorkflow": "Voice-to-Task & Project Controls Synthesis"
+    }
+  ]
+}

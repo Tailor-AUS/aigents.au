@@ -1,0 +1,50 @@
+{
+  "company": {
+    "name": "Apex Clean Energy & Minerals",
+    "slug": "apex-energy",
+    "industry": "Renewables & Heavy Industry Decarbonisation",
+    "mission": "Transitioning heavy haulage and industrial processing to 100% net-zero emissions through electrification, automated microgrids, and battery storage.",
+    "strategicPriorities": [
+      "Fleet Decarbonisation & Battery Electric Systems",
+      "Autonomous Infrastructure & Telemetry Monitoring",
+      "Rigorous Safety & Regulatory Compliance (AS/NZS 3000, ISO 50001)"
+    ]
+  },
+  "role": {
+    "title": "Systems & Automation Engineer (Vacation / Undergraduate / Junior)",
+    "department": "Decarbonisation & Fleet Automation",
+    "level": "Undergraduate / Graduate / Co-op Placement",
+    "location": "Brisbane / Perth (Hybrid / Site Visits)",
+    "duration": "8–12 Week High-Impact Sprint (or Flexible Semester)",
+    "overview": "Join our engineering team supporting the deployment of heavy electric haulage systems, battery telemetry analytics, and autonomous charging infrastructure."
+  },
+  "advertisedRequirements": [
+    "Currently pursuing or completed a degree in Mechanical, Mechatronics, Electrical, or Systems Engineering",
+    "High analytical and mathematical capability with proficiency in Python or MATLAB",
+    "Experience analyzing telemetry, sensor time-series data, or equipment diagnostics",
+    "Familiarity with relevant Australian Standards and safety regulations",
+    "Strong technical documentation, communication, and project coordination skills"
+  ],
+  "identifiedOperationalBottlenecks": [
+    {
+      "requirement": "Telemetry & Sensor Data Analysis",
+      "teamStrain": "Senior engineers lose 15+ hours/week manually parsing noisy CSV sensor logs and diagnosing transient battery fault codes.",
+      "complementaryWorkflow": "Automated Anomaly & Telemetry Parsing Pipeline"
+    },
+    {
+      "requirement": "Standards & Regulatory Auditing",
+      "teamStrain": "Manual cross-referencing of AS/NZS electrical and mechanical compliance specs creates bottlenecks before equipment sign-off.",
+      "complementaryWorkflow": "Sovereign Regulatory & Standards Vector RAG"
+    },
+    {
+      "requirement": "Technical Documentation & Risk Registers",
+      "teamStrain": "Engineers are backlogged updating FMEA matrices, HAZOP logs, and weekly shift handoff documentation.",
+      "complementaryWorkflow": "Voice-to-Task & Project Controls Synthesis"
+    },
+    {
+      "requirement": "Simulation Scripting & Parameter Testing",
+      "teamStrain": "Writing repetitive parameter sweep scripts for battery thermal models drains lead engineering time.",
+      "complementaryWorkflow": "Agentic Simulation Code Loops"
+    }
+  ]
+}
