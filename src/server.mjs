@@ -423,10 +423,11 @@ function renderApexLandingHtml(jobs, candidate) {
         <span class="brand-pill">Talent Substrate</span>
       </a>
       <div class="nav-links">
+        <a href="/build" class="nav-link">Build CV/AIgent</a>
         <a href="#students" class="nav-link">For Students</a>
         <a href="#employers" class="nav-link">For Employers</a>
         <a href="#live-portals" class="nav-link">Active Portals</a>
-        <a href="#students" class="btn btn-emerald">Get Guaranteed Wage</a>
+        <a href="/build" class="btn btn-emerald">Build CV/AIgent & Claim Retainer</a>
       </div>
     </div>
   </header>
@@ -442,7 +443,7 @@ function renderApexLandingHtml(jobs, candidate) {
         <p class="hero-sub">No unpaid internships. No retail jobs to pay rent while earning an engineering degree. Aigents.au equips top 1% STEM undergraduates with enterprise AI weapon systems and deploys them to high-impact engineering sprints.</p>
         
         <div class="hero-ctas">
-          <a href="#students" class="btn btn-emerald" style="padding: 14px 28px; font-size: 15px;">🎓 Apply for Guaranteed Wage Fellowship</a>
+          <a href="/build" class="btn btn-emerald" style="padding: 14px 28px; font-size: 15px;">🎓 Build Your CV/AIgent & Unlock Guaranteed Retainer →</a>
           <a href="#employers" class="btn btn-secondary" style="padding: 14px 28px; font-size: 15px;">🏢 Deploy AI-Tooled Talent in 48h</a>
         </div>
 
@@ -503,7 +504,7 @@ function renderApexLandingHtml(jobs, candidate) {
                 </li>
               </ul>
             </div>
-            <a href="mailto:fellows@aigents.au?subject=Application%20for%20Aigents%20Paid%20Fellowship" class="btn btn-emerald" style="width: 100%; justify-content: center;">Apply for the Fellowship →</a>
+            <a href="/build" class="btn btn-emerald" style="width: 100%; justify-content: center;">Submit Transcript & Build AIgent ($750/wk Retainer) →</a>
           </div>
 
           <!-- Employer Side -->
