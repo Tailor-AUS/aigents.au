@@ -1,0 +1,101 @@
+{
+  "id": "jordan-miller",
+  "name": "Jordan Miller",
+  "email": "j.miller@unsw.edu.au",
+  "phone": "",
+  "title": "AI-Tooled Systems & Electrical Engineering Fellow",
+  "tier": "ATAR 99.25",
+  "status": "Active Fellow — Guaranteed Retainer Enrolled",
+  "weeklyRetainer": "$750/week Base + $45–$55/hr Placement",
+  "education": {
+    "degree": "Bachelor of Engineering (Honours)",
+    "discipline": "Systems & Electrical Engineering",
+    "university": "UNSW Sydney",
+    "graduationYear": "2026",
+    "honours": "First Class Honours Track",
+    "academicHighlights": [
+      "ATAR 99.25 (State Merit Rank)",
+      "Dean's Commendation for Academic Excellence",
+      "Aigents.au Enterprise AI Workflow Fellow"
+    ]
+  },
+  "transcriptSubmitted": true,
+  "transcriptDocName": "UNSW_Transcript_JM.pdf",
+  "submittedAt": "2026-09-13T07:17:51.399Z",
+  "valueProposition": "High-horsepower analytical foundation paired with autonomous AI workflows to eliminate senior engineering drag from Day 1.",
+  "aiWorkflowSuite": [
+    {
+      "category": "Telemetry & Data Pipelines",
+      "name": "Automated Anomaly & Telemetry Parsing",
+      "description": "Python + Polars data pipelines augmented with agentic anomaly detection to wrangle dirty sensor logs and time-series data without manual data cleaning drag.",
+      "tools": [
+        "Python",
+        "Polars",
+        "Pandas",
+        "DuckDB",
+        "Agentic Pipelines"
+      ]
+    },
+    {
+      "category": "Standards & Compliance",
+      "name": "Sovereign Regulatory & Standards RAG",
+      "description": "Vectorised regulatory database over AS/NZS, ISO, and site-specific safety standards for instant clause retrieval, cross-referencing, and automated compliance auditing.",
+      "tools": [
+        "Vector RAG",
+        "Embedding Search",
+        "Australian Standards (AS/NZS)",
+        "ISO Standards"
+      ]
+    },
+    {
+      "category": "Simulation & Modeling",
+      "name": "Agentic Code Loops & Digital Twins",
+      "description": "AI-assisted parameter sweeps, finite element analysis (FEA) verification scripts, and automated test harness generation.",
+      "tools": [
+        "MATLAB",
+        "Python",
+        "CAD Automation",
+        "Automated Testing"
+      ]
+    },
+    {
+      "category": "Operational PMO & Reporting",
+      "name": "Voice-to-Task & Shift Handoff Synthesis",
+      "description": "Automated transcription and structured action-item extraction from technical discussions, auto-updating Jira/project risk registers.",
+      "tools": [
+        "Whisper",
+        "Structured JSON Extraction",
+        "Project Controls",
+        "HAZOP/FMEA Logs"
+      ]
+    }
+  ],
+  "technicalSkills": {
+    "languages": [
+      "Python",
+      "C++"
+    ],
+    "engineeringTools": [
+      "Altium",
+      "MATLAB"
+    ],
+    "aiTooling": [
+      "Agentic Coding Loops",
+      "Standards Vector RAG",
+      "Prompt Harnessing",
+      "Function Calling",
+      "Local Embeddings"
+    ]
+  },
+  "proofProjects": [
+    {
+      "name": "Embedded Telemetry & Power Management",
+      "summary": "Designed low-power telemetry board.",
+      "impact": "Absorbs 15+ hours per week of manual senior engineering data wrangling."
+    }
+  ],
+  "contact": {
+    "availability": "Immediate / Vacation / Semester Co-op",
+    "location": "Brisbane / Gold Coast / WA Fly-In Fly-Out"
+  }
+}
