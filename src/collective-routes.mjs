@@ -20,12 +20,14 @@ export function createCollectiveRoutes(platform, { readJson, json, html, redirec
         if (pathname === '/team/projects') html(res, renderCollectiveAdminHtml(model)); else json(res, 200, model);
         return true;
       }
-      if (req.method === 'POST' && pathname === '/api/team/projects') { json(res, 201, { project: await collective.createProject(await readJson(req)) }); return true; }
       const project = pathname.match(/^\/api\/team\/projects\/([^/]+)$/);
-      if (req.method === 'POST' && project) { json(res, 200, { project: await collective.setProject(project[1], await readJson(req)) }); return true; }
       const task = pathname.match(/^\/api\/team\/projects\/([^/]+)\/tasks\/([^/]+)$/);
-      if (req.method === 'POST' && task) { json(res, 200, await collective.reviewTask(task[1], task[2], await readJson(req))); return true; }
-      throw new InputError('Page not found.', 404);
+      if (pathname !== '/api/team/projects' && !project && !task) throw new InputError('Page not found.', 404);
+      if (req.method !== 'POST') throw new InputError('Method not allowed.', 405);
+      if (pathname === '/api/team/projects') json(res, 201, { project: await collective.createProject(await readJson(req)) });
+      else if (project) json(res, 200, { project: await collective.setProject(project[1], await readJson(req)) });
+      else json(res, 200, await collective.reviewTask(task[1], task[2], await readJson(req)));
+      return true;
     }
     const auth = await platform.session(studentCookie);
     if (!auth) {
@@ -44,21 +46,20 @@ export function createCollectiveRoutes(platform, { readJson, json, html, redirec
       if (project[1]) json(res, 200, model); else html(res, renderCollectiveProjectHtml(model));
       return true;
     }
+    const post = pathname.match(/^\/api\/community\/posts\/([^/]+)\/(like|comments)$/);
+    const allocation = pathname.match(/^\/api\/projects\/([^/]+)\/allocation$/);
+    const task = pathname.match(/^\/api\/projects\/([^/]+)\/tasks\/([^/]+)$/);
+    const update = pathname.match(/^\/api\/projects\/([^/]+)\/updates$/);
+    // An unknown address is missing, not a rejected method: check the address first.
+    if (!['/api/community/join', '/api/community/posts'].includes(pathname) && !post && !allocation && !task && !update) throw new InputError('Page not found.', 404);
     if (req.method !== 'POST') throw new InputError('Method not allowed.', 405);
     const body = await readJson(req);
     if (pathname === '/api/community/join') json(res, 200, { membership: await collective.join(profile, body) });
     else if (pathname === '/api/community/posts') json(res, 201, await collective.post(profile, body));
-    else {
-      const post = pathname.match(/^\/api\/community\/posts\/([^/]+)\/(like|comments)$/);
-      const allocation = pathname.match(/^\/api\/projects\/([^/]+)\/allocation$/);
-      const task = pathname.match(/^\/api\/projects\/([^/]+)\/tasks\/([^/]+)$/);
-      const update = pathname.match(/^\/api\/projects\/([^/]+)\/updates$/);
-      if (post) json(res, 200, post[2] === 'like' ? await collective.react(profile, post[1]) : await collective.comment(profile, post[1], body));
-      else if (allocation) json(res, 200, await collective.allocate(profile, allocation[1], body));
-      else if (task) json(res, 200, await collective.task(profile, task[1], task[2], body));
-      else if (update) json(res, 201, await collective.update(profile, update[1], body));
-      else throw new InputError('Page not found.', 404);
-    }
+    else if (post) json(res, 200, post[2] === 'like' ? await collective.react(profile, post[1]) : await collective.comment(profile, post[1], body));
+    else if (allocation) json(res, 200, await collective.allocate(profile, allocation[1], body));
+    else if (task) json(res, 200, await collective.task(profile, task[1], task[2], body));
+    else json(res, 201, await collective.update(profile, update[1], body));
     return true;
   };
 }

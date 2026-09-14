@@ -1,4 +1,5 @@
 /** Account, private profile and public student profile views. */
+import { CAMPUSES } from '../engine/collective.mjs';
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const scriptJson = value => JSON.stringify(value).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
 const profileFieldLimits = {name:100,university:150,discipline:100,wam:40,atar:20,languages:500,tools:500,projectTitle:180,projectSummary:4000,transcriptName:200,bio:1500,location:180,availability:300};
@@ -15,7 +16,7 @@ const styles = `
 
 function page(title, content, script = '', signedIn = false) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="robots" content="noindex"><title>${escapeHtml(title)} | aigents.au</title><style>${styles}</style></head><body>
-  <header><div class="container nav"><a class="brand" href="/" aria-label="aigents.au home"><span>aigents<span class="brand-dot">.</span></span><span class="brand-mark" aria-hidden="true">✳</span></a><nav class="nav-actions" aria-label="Account navigation">${signedIn ? '<a href="#enquiries">Enquiries</a><button type="button" class="text-button" id="logoutButton">Sign out</button>' : '<a class="home-link" href="/">Home</a><a href="/signin">Sign in</a>'}</nav></div></header>
+  <header><div class="container nav"><a class="brand" href="/" aria-label="aigents.au home"><span>aigents<span class="brand-dot">.</span></span><span class="brand-mark" aria-hidden="true">✳</span></a><nav class="nav-actions" aria-label="Account navigation">${signedIn ? '<a href="/community">My campus</a><a href="#enquiries">Enquiries</a><button type="button" class="text-button" id="logoutButton">Sign out</button>' : '<a class="home-link" href="/">Home</a><a href="/signin">Sign in</a>'}</nav></div></header>
   <main class="container">${content}</main><footer><div class="container footer-inner"><span>aigents.au · Engineering talent, amplified by AI.</span><span class="footer-links"><a href="/privacy">Privacy</a><a href="/">Back to home ↗</a></span></div></footer>${script ? `<script>${script}</script>` : ''}</body></html>`;
 }
 
@@ -155,8 +156,9 @@ const dashboardScript = String.raw`
   updateSharingDisplay();
 `;
 
-export function renderProfileHtml(profile, enquiries = []) {
+export function renderProfileHtml(profile, enquiries = [], universities = CAMPUSES) {
   const publicPath = '/students/' + encodeURIComponent(profile.id);
+  const universityNames = (Array.isArray(universities) ? universities : []).map(item => item.name).join(', ') || 'selected Australian universities';
   const sharing = profile.sharingEnabled === true;
   const count = Array.isArray(enquiries) ? enquiries.length : 0;
   const html = `<p class="eyebrow">Your student account</p><h1>A profile that grows<br>with you.</h1><p class="intro">Review your details, build on your experience and choose when to share your profile with engineering teams.</p><p id="accountStatus" class="status error" role="alert"></p>
@@ -165,7 +167,7 @@ export function renderProfileHtml(profile, enquiries = []) {
       <fieldset class="editor-fields" id="editorFields"><section class="section" aria-labelledby="aboutHeading"><h3 id="aboutHeading"><span class="section-number" aria-hidden="true">01</span>About you</h3><div class="form-grid">
         ${inputField('name', 'Full name', profile.name, {required:true})}
         <div class="field"><label for="accountEmail">Email <span class="private-label">· Private</span></label><input id="accountEmail" type="email" value="${escapeHtml(profile.email)}" readonly aria-describedby="emailHint"><p class="hint" id="emailHint">Your sign-in email. It can't be changed here.</p></div>
-        ${inputField('university', 'University', profile.university, {required:true})}
+        ${inputField('university', 'University', profile.university, {required:true,hint:`University collectives currently run at ${escapeHtml(universityNames)}. Your university is self-declared and is not verified against university records; it is fixed once you join a campus community.`})}
         ${inputField('discipline', 'Engineering discipline', profile.discipline, {required:true})}
         ${inputField('bio', 'About you', profile.bio, {multiline:true,full:true,hint:'A short introduction to your interests, strengths and the engineering work you want to do.'})}
         ${inputField('location', 'Location', profile.location, {hint:'For example, Brisbane or open to remote work.'})}
@@ -186,7 +188,7 @@ export function renderProfileHtml(profile, enquiries = []) {
       <div id="profileError" class="status-box" role="alert" hidden><span id="profileErrorText"></span><p id="conflictHelp" hidden><a href="/profile">Reload your saved profile</a></p><p id="sessionHelp" hidden><a href="/signin">Sign in again</a></p></div><div class="save-row"><p id="saveStatus" class="status" role="status" aria-live="polite"></p><button class="button" id="saveButton" type="submit">Save profile</button></div>
     </form>
     <section class="enquiries" id="enquiries" aria-labelledby="enquiriesHeading"><h2 id="enquiriesHeading">Employer enquiries <span class="message-count">${count}</span></h2><p class="card-desc">Read the project brief and reply when an opportunity feels like a fit.</p>${enquiryCards(enquiries)}</section>
-  </div><aside class="rail" aria-label="Your profile overview"><div class="card"><div class="avatar" id="profileInitial" aria-hidden="true">${escapeHtml(String(profile.name || 'S').trim().charAt(0).toUpperCase())}</div><h2 class="rail-name" id="profileName">${escapeHtml(profile.name)}</h2><p class="rail-subtitle" id="profileDiscipline">${escapeHtml(profile.discipline)}</p><span class="badge${sharing ? '' : ' private'}" id="sharingBadge">${sharing ? 'Public profile enabled' : 'Private profile'}</span><div class="rail-links"><a href="#profileForm">Edit your profile</a><a href="#enquiries">View employer enquiries (${count})</a></div></div><p class="hint">Your experience, in your own words. Include work you can explain and skills you've used.</p></aside></div>`;
+  </div><aside class="rail" aria-label="Your profile overview"><div class="card"><div class="avatar" id="profileInitial" aria-hidden="true">${escapeHtml(String(profile.name || 'S').trim().charAt(0).toUpperCase())}</div><h2 class="rail-name" id="profileName">${escapeHtml(profile.name)}</h2><p class="rail-subtitle" id="profileDiscipline">${escapeHtml(profile.discipline)}</p><span class="badge${sharing ? '' : ' private'}" id="sharingBadge">${sharing ? 'Public profile enabled' : 'Private profile'}</span><div class="rail-links"><a href="#profileForm">Edit your profile</a><a href="/community">Go to my campus community</a><a href="#enquiries">View employer enquiries (${count})</a></div></div><p class="hint">Your experience, in your own words. Include work you can explain and skills you've used.</p></aside></div>`;
   return page('Your student profile', html, `const profileState = ${scriptJson({version:profile.version,sharingEnabled:sharing})};${dashboardScript}`, true);
 }
 
