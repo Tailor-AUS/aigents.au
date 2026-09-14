@@ -134,7 +134,7 @@ export function renderBuilderHtml() {
               </div>
               <div class="input-group">
                 <label for="university">University <span class="required-mark">*</span></label>
-                <select id="university" name="university" required>
+                <select id="university" name="university" required aria-describedby="universityHint">
                   <option value="" disabled selected>Select your university</option>
                   <option value="University of Queensland">University of Queensland (UQ)</option>
                   <option value="Queensland University of Technology">Queensland University of Technology (QUT)</option>
@@ -147,6 +147,7 @@ export function renderBuilderHtml() {
                   <option value="University of Adelaide">University of Adelaide</option>
                   <option value="Other Australian University">Other Australian University</option>
                 </select>
+                <p class="field-hint" id="universityHint">Self-declared. Aigents does not verify enrolment.</p>
               </div>
               <div class="input-group">
                 <label for="discipline">Engineering discipline <span class="required-mark">*</span></label>
