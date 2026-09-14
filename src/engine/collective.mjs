@@ -20,6 +20,7 @@ export const ANAX_DRAFT = {
   deliverables: [], status: 'preparing',
   internalNotes: 'Confirm the client-approved brief, authorised source access, delivery dates, student participation terms and fee allocation before opening this project. The FTE target is workload planning. The project fee is not a confirmed student payout pool. University assignment is required.',
 };
+export const MAX_STUDENT_UNITS = 30;
 const active = project => ['recruiting', 'active'].includes(project.status);
 const terminal = project => ['completed', 'cancelled'].includes(project.status);
 const now = () => new Date().toISOString();
@@ -101,7 +102,9 @@ export class Collective {
   async community(profile) {
     const membership = await this.membership(profile);
     const catalog = membership ? CAMPUSES.find(item => item.id === membership.campusId) : campusFor(profile.university);
-    const base = { profile, campus: catalog || { id: '', name: profile.university, shortName: profile.university }, membership: null, members: [], posts: [], projects: [], myFte: 0, maxFte: 0.3 };
+    const base = { profile, campus: catalog || { id: '', name: profile.university, shortName: profile.university }, campusRecognised: Boolean(catalog),
+      universities: CAMPUSES.map(item => ({ id: item.id, name: item.name, shortName: item.shortName })),
+      membership: null, members: [], posts: [], projects: [], myFte: 0, maxFte: MAX_STUDENT_UNITS / 100 };
     if (!membership) return base;
     const campus = (await this.store.get(`collectives/${membership.campusId}`))?.data;
     if (!campus?.members.some(item => item.id === profile.id)) return base;
@@ -124,17 +127,17 @@ export class Collective {
     const memberUnits = project.allocations.find(item => item.studentId === profile.id)?.units || 0;
     const canWork = memberUnits > 0;
     return { profile, campus: catalog, project: this.projectView(project, campus, { workspace: canWork }), memberFte: memberUnits / 100,
-      myFte: studentUnits(campus, profile.id) / 100, maxFte: 0.3, canWork,
+      myFte: studentUnits(campus, profile.id) / 100, maxFte: MAX_STUDENT_UNITS / 100, canWork,
       updates: canWork ? project.updates.map(update => ({ id: update.id, authorName: campus.members.find(member => member.id === update.authorId)?.name || 'Student', text: update.text, createdAt: update.createdAt })) : [] };
   }
   async allocate(profile, id, body) {
-    const amount = units(body.fte, 30);
+    const amount = units(body.fte, MAX_STUDENT_UNITS);
     const { membership } = await this.projectContext(profile, id);
     await this.mutateCampus(membership.campusId, campus => {
       const project = campus.projects.find(item => item.id === id);
       if (!active(project)) throw new InputError('This project is not accepting workload commitments.', 409);
       const previous = project.allocations.find(item => item.studentId === profile.id)?.units || 0;
-      if (studentUnits(campus, profile.id) - previous + amount > 30) throw new InputError('Your total active commitment cannot exceed 0.30 FTE.', 409);
+      if (studentUnits(campus, profile.id) - previous + amount > MAX_STUDENT_UNITS) throw new InputError(`Your total active commitment cannot exceed ${(MAX_STUDENT_UNITS / 100).toFixed(2)} FTE.`, 409);
       if (allocatedUnits(project) - previous + amount > project.targetUnits) throw new InputError('There is not enough unallocated FTE on this project.', 409);
       if (amount === 0 && project.tasks.some(task => task.assigneeId === profile.id && task.status !== 'done')) throw new InputError('Unassign your unfinished tasks before leaving this project.', 409);
       project.allocations = project.allocations.filter(item => item.studentId !== profile.id);
@@ -187,16 +190,19 @@ export class Collective {
       } else {
         if (task.assigneeId !== profile.id) throw new InputError('Only the assigned student can change this task.', 403);
         if (task.status === 'done') throw new InputError('This output has been approved. Ask the team to reopen it.', 409);
-        if (body.action === 'unassign') { task.assigneeId = ''; task.status = 'open'; delete task.submission; }
-        else if (body.action === 'start') {
+        if (body.action === 'unassign') {
+          if (task.status === 'submitted') throw new InputError('This output is with a reviewer. Ask for it to be reopened before releasing the task.', 409);
+          task.assigneeId = ''; task.status = 'open'; delete task.submission;
+        } else if (body.action === 'start') {
           if (!['claimed', 'in_progress'].includes(task.status)) throw new InputError('This task is awaiting review.', 409);
           task.status = 'in_progress';
         } else if (body.action === 'submit') {
+          if (!['claimed', 'in_progress', 'submitted'].includes(task.status)) throw new InputError('This task is not ready to submit.', 409);
           const url = text(body.url || '', 'Output link', 2000, true);
           const note = text(body.note || '', 'Output note', 2000, true);
           if (!url && !note) throw new InputError('Add an output link or a handover note.');
           if (url) { let parsed; try { parsed = new URL(url); } catch { throw new InputError('Use a complete http or https output link.'); } if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) throw new InputError('Use a complete http or https output link.'); }
-          task.submission = { url, note }; task.status = 'submitted';
+          task.submission = { id: randomUUID(), url, note, submittedAt: now() }; task.status = 'submitted';
         } else throw new InputError('Unknown task action.');
       }
       project.version = randomUUID();
@@ -219,7 +225,10 @@ export class Collective {
     const campuses = await this.store.list('collectives');
     return { campuses: CAMPUSES, projects: order(campuses.flatMap(campus => campus.projects.map(project => this.projectView(project, campus, { operator: true })))), anaxDraft: ANAX_DRAFT };
   }
-  async createProject(body) {
+  async createProject(input) {
+    // Seeding Anax only asks the operator for a university: everything it does not supply falls
+    // back to the fixed public teaser, so the founding project cannot gain invented terms.
+    const body = input.seedAnax === true ? { ...ANAX_DRAFT, ...input } : input;
     const campusId = text(body.campusId, 'University', 40);
     if (!CAMPUSES.some(campus => campus.id === campusId)) throw new InputError('Choose the university that will host this project.');
     if (!['preparing', 'recruiting'].includes(body.status)) throw new InputError('Create a project as preparing or recruiting.');
@@ -263,12 +272,19 @@ export class Collective {
       if (!project) throw new InputError('Project not found.', 404);
       if (project.version !== body.version) throw new InputError('This project changed. Reload before updating it.', 409);
       if (!['preparing', 'recruiting', 'active', 'completed', 'cancelled'].includes(body.status)) throw new InputError('Choose a valid project status.');
-      if (body.summary !== undefined || body.deliverables !== undefined) {
+      const summary = body.summary === undefined ? undefined : text(body.summary, 'Brief', 4000);
+      let deliverables;
+      if (body.deliverables !== undefined) {
+        if (!Array.isArray(body.deliverables) || body.deliverables.length > 60) throw new InputError('Add up to 60 outputs.');
+        deliverables = body.deliverables.map(item => text(item, 'Output', 500));
+      }
+      const summaryChanged = summary !== undefined && summary !== project.summary;
+      const outputsChanged = deliverables !== undefined && (deliverables.length !== project.deliverables.length || deliverables.some((item, index) => item !== project.deliverables[index]));
+      if (summaryChanged || outputsChanged) {
         if (project.status !== 'preparing' || project.allocations.length) throw new InputError('Only an unstaffed preparing project can have its brief changed.', 409);
-        if (body.summary !== undefined) project.summary = text(body.summary, 'Brief', 4000);
-        if (body.deliverables !== undefined) {
-          if (!Array.isArray(body.deliverables) || body.deliverables.length > 60) throw new InputError('Add up to 60 outputs.');
-          project.deliverables = body.deliverables.map(item => text(item, 'Output', 500));
+        if (summaryChanged) project.summary = summary;
+        if (outputsChanged) {
+          project.deliverables = deliverables;
           project.tasks = project.deliverables.map(title => ({ id: randomUUID(), title, status: 'open', assigneeId: '' }));
         }
       }
@@ -287,11 +303,15 @@ export class Collective {
       if (!project || !active(project)) throw new InputError('This project is not active.', 409);
       const task = project.tasks.find(item => item.id === taskId);
       if (!task) throw new InputError('Task not found.', 404);
-      if (body.action === 'approve' && task.status === 'submitted') task.status = 'done';
-      else if (body.action === 'reopen' && ['submitted', 'done'].includes(task.status)) {
-        if (project.allocations.some(item => item.studentId === task.assigneeId)) task.status = 'in_progress';
-        else { task.status = 'open'; task.assigneeId = ''; }
-      } else throw new InputError('This output is not ready for that review action.', 409);
+      if (!['approve', 'reopen'].includes(body.action)) throw new InputError('Choose approve or request changes.');
+      if (!['submitted', 'done'].includes(task.status)) throw new InputError('This output is not ready for that review action.', 409);
+      if (body.action === 'approve' && task.status !== 'submitted') throw new InputError('This output is not ready for that review action.', 409);
+      // A student may replace their output at any time before sign-off. Reviewing without naming
+      // the submission that was read would approve or reject work the reviewer never saw.
+      if (task.submission?.id && body.submissionId !== task.submission.id) throw new InputError('This output changed since you opened it. Reload the submission before reviewing it.', 409);
+      if (body.action === 'approve') task.status = 'done';
+      else if (project.allocations.some(item => item.studentId === task.assigneeId)) task.status = 'in_progress';
+      else { task.status = 'open'; task.assigneeId = ''; delete task.submission; }
       project.version = randomUUID();
     });
     return { ok: true };

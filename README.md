@@ -1,6 +1,8 @@
 # Aigents
 
-A Node.js application for engineering student profiles and employer project enquiries. Students create an account, edit their profile, choose whether to share it and receive enquiries. Employers can submit a general request or contact a particular student through a shared profile.
+A Node.js application for engineering student profiles, university collectives and employer project enquiries. Students create an account, edit their profile, choose whether to share it and receive enquiries. Employers can submit a general request or contact a particular student through a shared profile.
+
+Each university has its own contained community: a campus feed, the projects assigned to that university, and a shared delivery workspace for the students who commit to a project. Communities and project teams never span universities.
 
 ## Routes and behaviour
 
@@ -14,7 +16,10 @@ A Node.js application for engineering student profiles and employer project enqu
 | `/students/{uuid}` | Shared student profile; returns 404 while sharing is off. |
 | `/employers` | General employer project enquiry, saved in the Aigents team inbox. |
 | `/employers?student={uuid}` | Enquiry for a currently shared profile, saved for that student and the Aigents team. |
+| `/community` | The signed-in student's university community: campus feed, campus projects and members. Prompts to join when they have not joined yet. |
+| `/projects/{id}` | A campus project brief. Its task workspace and team notes are visible only to students who have committed FTE to that project. |
 | `/team` | Operator sign-in and the authenticated inbox of all employer enquiries. |
+| `/team/projects` | Operator workspace: prepare briefs, assign a university, open recruitment and review submitted outputs. |
 | `/privacy` | Explanation of profile, account and enquiry data use. |
 | `/healthz` | Readiness check; verifies access to the configured data store. |
 
@@ -23,6 +28,18 @@ Profiles are **private by default**. Sharing is an explicit setting saved with t
 The account email currently cannot be changed. There are no automatic confirmation, enquiry-notification or password-reset emails. Students and operators must sign in to check their inboxes; contact details enable manual follow-up. An enquiry is a saved request, not a booking, a guaranteed placement or a payment agreement.
 
 The existing `/p/{slug}` and `/portal/{slug}` company examples use the legacy seed data in `data/`. They remain separate from registered student accounts and do not represent a live directory of applicants or confirmed employer partnerships.
+
+## University collectives
+
+A student joins exactly one campus community, chosen from the university on their profile. **Campus membership is self-declared.** Aigents matches the university name the student entered against the supported list; it does not verify enrolment against university records, and no verification mechanism exists yet. A student's university is fixed once they join, so a correction requires the Aigents team.
+
+Community posts, comments, reactions, project briefs, task submissions and team notes are readable only inside the university that owns them. A student from another university receives the same "not found" response as a student who guessed a project ID.
+
+Every project carries a target workload in FTE, and **each student may hold at most 0.30 FTE in total across all of their active projects**. FTE is planning capacity only. It is not hours worked, an employment contract, a payment agreement or an entitlement to any share of a project fee; a listed budget is the client project fee. Capacity is enforced by a single conditional write over the whole campus record, so simultaneous commitments cannot oversubscribe either a project's target or a student's personal cap.
+
+Projects move `preparing` → `recruiting` → `active` → `completed` or `cancelled`. The brief and agreed outputs can only be changed while a project is preparing and unstaffed; after that the scope is locked and only the status changes. Closed projects cannot reopen, and closing one releases its students' capacity. Students claim tasks, submit an output link or handover note, and may replace a submission until it is signed off. Operators approve or request changes; **an approval names the exact submission the reviewer opened**, so a submission replaced in the meantime is refused rather than signed off unseen.
+
+The Anax founding project exists on the public homepage only as an A$7,500 `Preparing` teaser with no university assigned. An operator assigns its university from `/team/projects`, which creates it as a single preparing project. Its private preparation checklist is operator-only and never reaches the student views or API.
 
 ## Local development
 

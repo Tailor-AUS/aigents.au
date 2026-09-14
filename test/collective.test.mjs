@@ -40,6 +40,12 @@ async function joinAll(collective, profiles) {
   for (const profile of profiles) await collective.join(profile, { consent: true });
 }
 
+/** The id of the submission currently attached to a task, as a reviewer would read it. */
+async function submissionId(collective, profile, projectId, taskId) {
+  const { project } = await collective.project(profile, projectId);
+  return project.tasks.find(task => task.id === taskId)?.submission?.id;
+}
+
 test('membership requires consent, recognises campus aliases and cannot switch university', async t => {
   const { collective, restart } = await fixture(t);
   const uq = student('UQ member', 'The University of Queensland');
@@ -200,7 +206,7 @@ test('four 0.25 FTE students fill one project and terminal status releases their
   for (const task of current.tasks) {
     await collective.task(members[0], project.id, task.id, { action: 'claim' });
     await collective.task(members[0], project.id, task.id, { action: 'submit', note: 'Synthetic deliverable ready for review.' });
-    await collective.reviewTask(project.id, task.id, { action: 'approve' });
+    await collective.reviewTask(project.id, task.id, { action: 'approve', submissionId: await submissionId(collective, members[0], project.id, task.id) });
   }
   current = (await collective.project(members[0], project.id)).project;
   const closed = await collective.setProject(project.id, { status: 'completed', version: current.version });
@@ -245,7 +251,7 @@ test('private projects and workspace actions require matching campus membership 
   await collective.task(owner, opened.id, taskId, { action: 'start' });
   await rejectsOperation(() => collective.task(owner, opened.id, taskId, { action: 'submit', url: 'javascript:alert(1)', note: 'Invalid link' }), 'unsafe submission URL');
   await collective.task(owner, opened.id, taskId, { action: 'submit', url: 'https://example.test/synthetic-deliverable', note: 'Ready for technical review.' });
-  await collective.reviewTask(opened.id, taskId, { action: 'approve' });
+  await collective.reviewTask(opened.id, taskId, { action: 'approve', submissionId: await submissionId(collective, owner, opened.id, taskId) });
   const marker = `Persistent workspace note ${randomUUID()}`;
   await collective.update(owner, opened.id, { text: marker });
   const durable = await restart().project(owner, opened.id);
@@ -257,4 +263,84 @@ test('private projects and workspace actions require matching campus membership 
   assert.equal(spectatorModel.canWork, false);
   assert.deepEqual(spectatorModel.updates, [], 'unallocated members cannot read private workspace updates');
   assert.equal(Object.hasOwn(spectatorModel.project.tasks.find(task => task.id === taskId), 'submission'), false, 'unallocated members cannot read task submissions');
+});
+
+test('a reviewer can only sign off the submission they opened, and a student cannot withdraw one under review', async t => {
+  const { collective, restart } = await fixture(t);
+  const owner = student('Resubmitting member');
+  const peer = student('Reviewing peer');
+  await joinAll(collective, [owner, peer]);
+  const project = await collective.createProject(brief({ deliverables: ['One agreed output'] }));
+  await collective.allocate(owner, project.id, { fte: 0.2 });
+  const taskId = (await collective.project(owner, project.id)).project.tasks[0].id;
+  await collective.task(owner, project.id, taskId, { action: 'claim' });
+  await collective.task(owner, project.id, taskId, { action: 'submit', url: 'https://example.test/first-draft', note: 'First version.' });
+
+  // The operator opens the review page here and reads the first submission.
+  const reviewed = await submissionId(collective, owner, project.id, taskId);
+  assert.ok(reviewed, 'a submission is identified so it can be reviewed exactly once');
+  await rejectsOperation(() => collective.reviewTask(project.id, taskId, { action: 'approve' }), 'approving without naming a submission');
+  await rejectsOperation(() => collective.reviewTask(project.id, taskId, { action: 'approve', submissionId: randomUUID() }), 'approving a submission the reviewer never read');
+
+  // The student replaces the output before the operator presses approve.
+  await collective.task(owner, project.id, taskId, { action: 'submit', note: 'Second version with corrections.' });
+  const replaced = await submissionId(collective, owner, project.id, taskId);
+  assert.notEqual(replaced, reviewed, 'replacing an output produces a new submission to review');
+  await rejectsOperation(() => collective.reviewTask(project.id, taskId, { action: 'approve', submissionId: reviewed }), 'stale approval after a resubmission');
+  await rejectsOperation(() => collective.reviewTask(project.id, taskId, { action: 'reopen', submissionId: reviewed }), 'stale rejection after a resubmission');
+  assert.equal((await restart().project(owner, project.id)).project.tasks[0].status, 'submitted', 'a refused review leaves the output awaiting review');
+
+  await rejectsOperation(() => collective.task(owner, project.id, taskId, { action: 'unassign' }), 'releasing a task that is with a reviewer');
+  await rejectsOperation(() => collective.task(owner, project.id, taskId, { action: 'start' }), 'restarting a task that is with a reviewer');
+  await rejectsOperation(() => collective.task(peer, project.id, taskId, { action: 'submit', note: 'Not my task' }), 'submitting against another student task');
+  await rejectsOperation(() => collective.allocate(owner, project.id, { fte: 0 }), 'leaving a project with an output still under review');
+
+  await collective.reviewTask(project.id, taskId, { action: 'reopen', submissionId: replaced });
+  const reopened = (await collective.project(owner, project.id)).project.tasks[0];
+  assert.equal(reopened.status, 'in_progress', 'requesting changes returns the output to its author');
+  assert.equal(reopened.assigneeId, owner.id);
+  await collective.task(owner, project.id, taskId, { action: 'submit', note: 'Third version after review.' });
+  await collective.reviewTask(project.id, taskId, { action: 'approve', submissionId: await submissionId(collective, owner, project.id, taskId) });
+  const approved = (await restart().project(owner, project.id)).project.tasks[0];
+  assert.equal(approved.status, 'done');
+  assert.equal(approved.submission.note, 'Third version after review.', 'the approved output is the version the reviewer read');
+  await rejectsOperation(() => collective.task(owner, project.id, taskId, { action: 'submit', note: 'After sign-off' }), 'replacing a signed-off output');
+});
+
+test('an operator can change status on a running project without re-sending its agreed brief', async t => {
+  const { collective, restart } = await fixture(t);
+  const member = student('Running project member');
+  await collective.join(member, { consent: true });
+  const project = await collective.createProject(brief({ status: 'recruiting' }));
+  await collective.allocate(member, project.id, { fte: 0.1 });
+  const staffed = (await collective.project(member, project.id)).project;
+
+  // The operator page re-sends the values it displayed. An unchanged brief is not an edit.
+  const running = await collective.setProject(project.id, { status: 'active', version: staffed.version, summary: staffed.summary, deliverables: [...staffed.deliverables] });
+  assert.equal(running.status, 'active', 'echoing an unchanged brief does not block a status change');
+  assert.deepEqual(running.tasks.map(task => task.id), project.tasks.map(task => task.id), 'an unchanged output list must not regenerate the task list');
+  await rejectsOperation(() => collective.setProject(project.id, { status: 'active', version: running.version, summary: 'A rewritten scope for staffed work.' }), 'rewriting the brief of a staffed project');
+  await rejectsOperation(() => collective.setProject(project.id, { status: 'active', version: running.version, deliverables: ['A replacement output'] }), 'replacing the outputs of a staffed project');
+  assert.equal((await restart().project(member, project.id)).project.summary, project.summary, 'a refused brief edit leaves the agreed scope intact');
+});
+
+test('the founding project seeds one preparing teaser and keeps its private planning note out of the student view', async t => {
+  const { collective } = await fixture(t);
+  const member = student('Founding project reader');
+  await collective.join(member, { consent: true });
+  // The operator supplies only the university it chose; the teaser figures come from the draft.
+  const anax = await collective.createProject({ campusId: 'uq', seedAnax: true });
+  assert.equal(anax.id, 'anax-pilot');
+  assert.equal(anax.status, 'preparing');
+  assert.equal(anax.budgetAud, 7500);
+  assert.equal(anax.targetFte, 1);
+  assert.deepEqual(anax.tasks, [], 'the founding teaser has no agreed outputs yet');
+  await rejectsOperation(() => collective.createProject({ campusId: 'qut', seedAnax: true }), 'the founding project cannot be duplicated into a second university');
+  await rejectsOperation(() => collective.createProject({ campusId: 'uq', seedAnax: true, status: 'recruiting' }), 'the founding project cannot open before its terms are confirmed');
+  await rejectsOperation(() => collective.allocate(member, anax.id, { fte: 0.1 }), 'students cannot commit to a preparing teaser');
+  const studentView = JSON.stringify(await collective.project(member, anax.id));
+  assert.ok(!studentView.includes('internalNotes'), 'the private planning note stays out of the student model');
+  assert.ok(!studentView.includes('authorised source access'), 'private preparation detail stays out of the student model');
+  const operatorView = (await collective.admin()).projects.find(item => item.id === 'anax-pilot');
+  assert.ok(operatorView.internalNotes.includes('participation terms'), 'the operator keeps the private preparation checklist');
 });
