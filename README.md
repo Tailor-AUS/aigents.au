@@ -87,7 +87,7 @@ That command displays the secret. Do not share its output or copy it into this R
 
 ## Preview, deployment and rollback
 
-Use a **separate private preview data container** and preview operator key. Keep preview traffic at zero until explicitly promoted; use a revision-specific preview URL for checks. Preview accounts and enquiries must be synthetic. Never point an unreviewed preview at the production data container.
+Use a **separate private preview data container** and keep operator keys secret. Keep preview traffic at zero and use a revision-specific preview URL for checks. Preview accounts and enquiries must be synthetic. Deploy the tested image in a separate revision configured with the production data container before promoting it. Never point an unreviewed preview at the production data container.
 
 Before production traffic moves, verify `/healthz`, signup, edit/reload, sharing on/off, targeted and general enquiries, both inboxes, sign-out and recovery against the preview configuration. Verify data survives a revision or replica restart. A healthy homepage alone does not establish that accounts can be saved.
 
