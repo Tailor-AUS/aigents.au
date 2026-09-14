@@ -3,6 +3,7 @@ import { ConflictError } from './engine/store.mjs';
 import { renderBuilderHtml } from './views/builder.mjs';
 import { renderProfileHtml, renderPublicProfileHtml, renderSignInHtml, renderRecoverHtml } from './views/profile.mjs';
 import { renderEmployerHtml, renderTeamHtml, renderTeamSignInHtml, renderPrivacyHtml } from './views/employer.mjs';
+import { createCollectiveRoutes } from './collective-routes.mjs';
 
 export async function readJson(req) {
   if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) throw new InputError('Send this request as JSON.', 415);
@@ -45,9 +46,10 @@ export function enforceOrigin(req) {
 }
 
 export function createPlatformRoutes(platform) {
+  const routeCollective = createCollectiveRoutes(platform, { readJson, json, html, redirect });
   return async function route(req, res, url) {
     const pathname = url.pathname;
-    const handled = ['/healthz', '/build', '/profile', '/signin', '/recover', '/employers', '/team', '/privacy'].includes(pathname) || /^\/(?:students\/|api\/(?:candidate\/register$|profile$|students\/|session\/|enquiries$|team\/))/.test(pathname);
+    const handled = ['/healthz', '/build', '/profile', '/signin', '/recover', '/employers', '/team', '/team/projects', '/privacy', '/community', '/api/community'].includes(pathname) || /^\/(?:projects\/|students\/|api\/(?:community\/|projects\/|candidate\/register$|profile$|students\/|session\/|enquiries$|team\/))/.test(pathname);
     if (!handled) return false;
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
@@ -62,6 +64,7 @@ export function createPlatformRoutes(platform) {
         await platform.limit(`${category}-ip:${remote}`, category === 'enquiry' ? 30 : category === 'auth' ? 60 : 150, 15 * 60_000);
       }
       if (req.method === 'GET' && pathname === '/healthz') { await platform.ready(); json(res, 200, { status: 'ok' }); return true; }
+      if (await routeCollective(req, res, pathname, studentCookie, teamCookie)) return true;
       if (req.method === 'GET' && pathname === '/privacy') { html(res, renderPrivacyHtml()); return true; }
       if (req.method === 'GET' && ['/build', '/signin', '/recover'].includes(pathname)) {
         if (pathname !== '/recover' && await platform.session(studentCookie)) redirect(res, '/profile');

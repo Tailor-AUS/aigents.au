@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomUUID, scrypt, timingSafeEqual } from 'no
 import { promisify } from 'node:util';
 import { ConflictError } from './store.mjs';
 import { InputError, normalizeEmail, normalizeProfile, normalizeEnquiry, publicProfile } from './candidate-manager.mjs';
+import { campusFor } from './collective.mjs';
 
 const derive = promisify(scrypt);
 export const digest = value => createHash('sha256').update(String(value)).digest('hex');
@@ -109,6 +110,8 @@ export class Platform {
     if (body.version !== previous.version) throw new InputError('This profile changed in another tab. Reload before saving again.', 409);
     const fields = normalizeProfile(body);
     const profile = { ...previous, ...fields, version: randomUUID(), updatedAt: new Date().toISOString() };
+    const membership = await this.store.get(`campus-memberships/${previous.id}`);
+    if (membership && campusFor(fields.university)?.id !== membership.data.campusId) throw new InputError('Your university is fixed after joining its community. Contact the Aigents team if it needs correcting.', 409);
     await this.store.put(`accounts/${auth.accountKey}`, { ...auth.account.data, profile }, { ifMatch: auth.account.etag });
     return profile;
   }
