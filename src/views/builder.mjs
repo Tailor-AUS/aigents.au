@@ -282,6 +282,7 @@ export function renderBuilderHtml() {
         transcriptName: selectedFileName
       };
       submissionInProgress = true;
+      focusBeforeModal = document.activeElement;
       button.disabled = true;
       button.textContent = 'Creating profile…';
       error.hidden = true;
@@ -298,7 +299,6 @@ export function renderBuilderHtml() {
         document.getElementById('savedName').textContent = payload.name;
         document.getElementById('savedUniversity').textContent = payload.university;
         document.getElementById('savedDiscipline').textContent = payload.discipline;
-        focusBeforeModal = document.activeElement;
         document.getElementById('successModal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.querySelector('#successModal .modal-box').focus();
