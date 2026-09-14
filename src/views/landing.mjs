@@ -42,8 +42,9 @@ export function renderApexLandingHtml(jobs) {
         <a class="nav-link" href="#how-it-works">How it works</a>
         <a class="nav-link" href="#for-you">For students</a>
         <a class="nav-link" href="#examples">See examples</a>
+        <a class="nav-link" href="/signin">Sign in</a>
       </nav>
-      <div class="nav-cta"><a class="nav-link" href="#for-you" data-employer-link>For employers</a><a class="btn btn-primary" href="/build">Create your profile ${arrow}</a><button class="menu-button" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="main-navigation"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
+      <div class="nav-cta"><a class="nav-link" href="/employers">For employers</a><a class="btn btn-primary" href="/build">Create your profile ${arrow}</a><button class="menu-button" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="main-navigation"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button></div>
     </div>
   </header>
   <main id="main">
@@ -53,8 +54,8 @@ export function renderApexLandingHtml(jobs) {
           <p class="eyebrow">Engineering students. Real opportunities.</p>
           <h1>Get paid to do<span>real engineering.</span></h1>
           <p class="hero-description">Aigents helps engineering students find paid project work while they study. Build a clear skills profile, prepare with practical AI tools and connect with employers.</p>
-          <div class="hero-actions"><a class="btn btn-primary" href="/build">I'm a student ${arrow}</a><a class="btn btn-secondary" href="#for-you" data-employer-link>I'm hiring ${arrow}</a></div>
-          <p class="hero-note">${check} Start with your profile. Bring your skills and projects.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="/build">I'm a student ${arrow}</a><a class="btn btn-secondary" href="/employers">I'm hiring ${arrow}</a></div>
+          <p class="hero-note">${check} Your profile starts private. Share it when you're ready.</p>
         </div>
         <div class="profile-stage" aria-label="Example of a student profile and project">
           <div class="stage-top"><p>More than a CV. Show what you can do.</p><span class="stage-pagination" aria-hidden="true"><i></i><i></i><i></i></span></div>
@@ -78,13 +79,13 @@ export function renderApexLandingHtml(jobs) {
       <div class="steps">
         <article class="step"><span class="step-number">01</span><h3>Show your skills.</h3><p>Create a student profile with your course, technical skills and a project you're proud of.</p><a class="text-link" href="/build">Create your profile ${arrow}</a></article>
         <article class="step"><span class="step-number">02</span><h3>Prepare for real work.</h3><p>See how AI can support engineering tasks, from analysing data to writing code and preparing reports.</p><a class="text-link" href="#examples">Explore project examples ${arrow}</a></article>
-        <article class="step"><span class="step-number">03</span><h3>Connect with employers.</h3><p>Use a clear, practical profile to start conversations about paid placements and project opportunities.</p><a class="text-link" href="#for-you">Find your next step ${arrow}</a></article>
+        <article class="step"><span class="step-number">03</span><h3>Connect with employers.</h3><p>Choose to share your profile with employers. Project enquiries sent to you appear in your profile inbox.</p><a class="text-link" href="/signin">Sign in to your profile ${arrow}</a></article>
       </div>
     </div></section>
     <section class="section audience-section" id="for-you"><div class="wrap audience-grid">
       <div class="audience-heading"><p class="eyebrow">Two sides. One good fit.</p><h2>Students ready to learn.<br>Teams with work to do.</h2><div class="audience-tabs" role="tablist" aria-label="Choose your perspective"><button id="student-tab" type="button" role="tab" aria-selected="true" aria-controls="student-panel">I'm a student</button><button id="employer-tab" type="button" role="tab" aria-selected="false" aria-controls="employer-panel" tabindex="-1">I'm an employer</button></div></div>
       <div class="audience-panel" id="student-panel" role="tabpanel" aria-labelledby="student-tab" tabindex="0"><p class="panel-eyebrow">FOR ENGINEERING STUDENTS</p><h3>Turn what you're learning<br>into something employers can see.</h3><ul class="benefits"><li>${check}<span>Put your coursework, projects and technical skills in one place.</span></li><li>${check}<span>Explain the work you can do, with practical project examples.</span></li><li>${check}<span>Start a conversation about paid experience in your field.</span></li></ul><a class="btn btn-primary" href="/build">Create your student profile ${arrow}</a></div>
-      <div class="audience-panel" id="employer-panel" role="tabpanel" aria-labelledby="employer-tab" tabindex="0" hidden><p class="panel-eyebrow">FOR ENGINEERING EMPLOYERS</p><h3>Find a student who can<br>contribute to your next project.</h3><ul class="benefits"><li>${check}<span>Explore skills and project examples beyond a traditional CV.</span></li><li>${check}<span>Discuss support for analysis, coding and technical documentation.</span></li><li>${check}<span>Agree on a suitable scope, supervision and paid work arrangement.</span></li></ul><a class="btn btn-primary" href="mailto:deploy@aigents.au?subject=Engineering%20student%20placement%20enquiry">Tell us about your project ${arrow}</a></div>
+      <div class="audience-panel" id="employer-panel" role="tabpanel" aria-labelledby="employer-tab" tabindex="0" hidden><p class="panel-eyebrow">FOR ENGINEERING EMPLOYERS</p><h3>Find a student who can<br>contribute to your next project.</h3><ul class="benefits"><li>${check}<span>Explore skills and project examples beyond a traditional CV.</span></li><li>${check}<span>Discuss support for analysis, coding and technical documentation.</span></li><li>${check}<span>Agree on a suitable scope, supervision and paid work arrangement.</span></li></ul><a class="btn btn-primary" href="/employers">Tell us about your project ${arrow}</a></div>
     </div></section>
     <section class="section" id="examples"><div class="wrap">
       <div class="section-head"><div><p class="eyebrow">See what that looks like</p><h2>Real-world roles.<br>Practical project examples.</h2></div><p class="section-description">Explore example profiles tailored to engineering roles, and see how a student's skills can support the work.</p></div>
@@ -95,12 +96,12 @@ export function renderApexLandingHtml(jobs) {
       <details><summary>What is Aigents, in one sentence?</summary><p>Aigents is a platform for engineering students to present their skills and projects, prepare with practical AI tools, and connect with employers about paid work.</p></details>
       <details><summary>Do I need to be an AI expert?</summary><p>You can start by adding the skills and projects you already have. Practical engineering knowledge comes first; AI tools support tasks such as coding, analysis and documentation.</p></details>
       <details><summary>Does creating a profile guarantee a job?</summary><p>Creating a profile is a first step. A placement, start date and pay depend on a suitable opportunity and an agreement with the employer.</p></details>
-      <details><summary>What happens after I create my profile?</summary><p>The builder saves your profile and shows a summary of the information you've provided. You can <a href="mailto:deploy@aigents.au?subject=Student%20placement%20enquiry">contact Aigents</a> to discuss placement opportunities and next steps.</p></details>
-      <details><summary>I'm an employer. Where do I start?</summary><p><a href="mailto:deploy@aigents.au?subject=Engineering%20student%20placement%20enquiry">Tell us about your project</a>, the skills you need and your preferred timing. We can discuss the scope of the work and what a student placement could look like.</p></details>
+      <details><summary>What happens after I create my profile?</summary><p>Your account saves your profile so you can return, edit it and view enquiries. It starts private. When you're ready, turn sharing on and send your profile link to employers. Your shared profile excludes your email address and academic grades. <a href="/signin">Sign in to your account</a> to manage your profile and sharing settings.</p></details>
+      <details><summary>I'm an employer. Where do I start?</summary><p><a href="/employers">Send a project enquiry</a> with the skills you need and your preferred timing. It is saved in the Aigents team inbox. If you enquire through a student's shared profile, the student can also view your request in their inbox.</p></details>
     </div></div></section>
     <div class="wrap"><section class="closing"><div><h2>Your engineering career<br>starts with what you can do.</h2><p>Let's put your skills and projects in the picture.</p></div><a class="btn btn-light" href="/build">Create your student profile ${arrow}</a></section></div>
   </main>
-  <footer class="footer"><div class="wrap footer-inner"><div><a class="brand" href="/" aria-label="Aigents home"><span class="brand-word">aigents<span>.</span></span></a><p class="footer-description">Engineering students. Practical AI skills. Paid work.</p></div><nav class="footer-links" aria-label="Footer navigation"><a href="/build">For students</a><a href="#for-you" data-employer-link>For employers</a><a href="mailto:deploy@aigents.au">Contact</a></nav></div></footer>
+  <footer class="footer"><div class="wrap footer-inner"><div><a class="brand" href="/" aria-label="Aigents home"><span class="brand-word">aigents<span>.</span></span></a><p class="footer-description">Engineering students. Practical AI skills. Paid work.</p></div><nav class="footer-links" aria-label="Footer navigation"><a href="/build">For students</a><a href="/employers">For employers</a><a href="/signin">Sign in</a><a href="/privacy">Privacy &amp; data</a><a href="mailto:deploy@aigents.au">Contact</a></nav></div></footer>
   <script>
     const menuButton=document.querySelector('.menu-button');
     const navigation=document.getElementById('main-navigation');

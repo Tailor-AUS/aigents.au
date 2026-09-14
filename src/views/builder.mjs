@@ -73,6 +73,7 @@ export function renderBuilderHtml() {
     .rail-note strong { display: block; color: var(--ink); margin-bottom: 5px; font-size: 12px; }
     footer { border-top: 1px solid var(--line); padding-block: 22px; color: var(--muted); font-size: 12px; }
     .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
     footer a { text-decoration: none; }
     .modal-backdrop { display: none; position: fixed; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: 24px; background: #15243ca6; backdrop-filter: blur(4px); }
     .modal-box { width: min(520px, 100%); max-height: calc(100dvh - 48px); overflow-y: auto; padding: 36px; background: white; border: 1px solid var(--line); border-radius: 20px; position: relative; }
@@ -86,6 +87,12 @@ export function renderBuilderHtml() {
     .saved-details dt { color: var(--muted); margin-top: 10px; font-size: 12px; }
     .saved-details dt:first-child { margin-top: 0; }
     .saved-details dd { margin: 1px 0 0; overflow-wrap: anywhere; }
+    .recovery-box { border: 1px solid #cad6fb; background: #f1f5ff; padding: 18px; border-radius: 10px; margin: 0 0 22px; }
+    .recovery-box h3 { margin: 0 0 8px; font-size: 16px; }
+    .recovery-box p { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+    .recovery-box code { display: block; padding: 12px; background: white; border: 1px solid var(--line); border-radius: 6px; font-size: 16px; overflow-wrap: anywhere; user-select: all; }
+    .account-note { margin: 16px 0 0; color: var(--muted); font-size: 14px; }
+    .account-note a { color: var(--blue); font-weight: 600; }
     @media (max-width: 960px) { .page-grid { grid-template-columns: minmax(0, 1fr) 250px; gap: 22px; } .form-card { padding: 26px; } .submit-area { flex-direction: column; align-items: stretch; gap: 18px; } .submit-copy { max-width: none; } }
     @media (max-width: 760px) { .container { width: calc(100% - 40px); } .nav-inner { min-height: 72px; } main { padding-top: 36px; } h1 { letter-spacing: -1.4px; } .intro { font-size: 16px; } .page-grid { grid-template-columns: 1fr; margin-top: 28px; } .side-rail { position: static; } .side-card { display: none; } .rail-note { margin: 0; } .form-card { padding: 24px; } }
     @media (max-width: 480px) { .container { width: calc(100% - 32px); } .back-link { font-size: 12px; } .input-grid { grid-template-columns: 1fr; } .form-card { padding: 22px 18px; } .section-desc { margin-left: 0; } h2 { font-size: 19px; } .modal-box { padding: 28px 22px; } }
@@ -103,6 +110,7 @@ export function renderBuilderHtml() {
     <p class="eyebrow">For engineering students</p>
     <h1>Create your<br>student profile.</h1>
     <p class="intro">Your next opportunity starts with what you can do. Tell us about your studies, skills and projects to take the first step towards paid engineering work supported by AI.</p>
+    <p class="account-note">Already have a profile? <a href="/signin">Sign in</a></p>
     <div class="page-grid">
       <div class="form-card">
         <form id="builderForm" onsubmit="submitCandidate(event)">
@@ -113,11 +121,16 @@ export function renderBuilderHtml() {
             <div class="input-grid">
               <div class="input-group">
                 <label for="name">Full name <span class="required-mark">*</span></label>
-                <input type="text" id="name" name="name" required autocomplete="name" placeholder="Your full name">
+                <input type="text" id="name" name="name" required maxlength="100" autocomplete="name" placeholder="Your full name">
               </div>
               <div class="input-group">
                 <label for="email">University email <span class="required-mark">*</span></label>
                 <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@university.edu.au">
+              </div>
+              <div class="input-group full-width">
+                <label for="password">Create a password <span class="required-mark">*</span></label>
+                <input type="password" id="password" name="password" required minlength="12" maxlength="128" autocomplete="new-password" aria-describedby="passwordHint">
+                <p class="field-hint" id="passwordHint">Use 12–128 characters. You'll use your email and password to return to your profile.</p>
               </div>
               <div class="input-group">
                 <label for="university">University <span class="required-mark">*</span></label>
@@ -149,12 +162,12 @@ export function renderBuilderHtml() {
               </div>
               <div class="input-group">
                 <label for="wam">Current WAM or GPA <span class="required-mark">*</span></label>
-                <input type="text" id="wam" name="wam" required placeholder="e.g. 84.5 WAM or 6.5/7 GPA" aria-describedby="wamHint">
+                <input type="text" id="wam" name="wam" required maxlength="40" placeholder="e.g. 84.5 WAM or 6.5/7 GPA" aria-describedby="wamHint">
                 <p class="field-hint" id="wamHint">Include the scale if you're entering a GPA.</p>
               </div>
               <div class="input-group">
                 <label for="atar">ATAR <span class="optional">Optional</span></label>
-                <input type="text" id="atar" name="atar" placeholder="e.g. 95.50" aria-describedby="atarHint">
+                <input type="text" id="atar" name="atar" maxlength="20" placeholder="e.g. 95.50" aria-describedby="atarHint">
                 <p class="field-hint" id="atarHint">If you finished school in the last four years.</p>
               </div>
             </div>
@@ -165,12 +178,12 @@ export function renderBuilderHtml() {
             <div class="input-grid">
               <div class="input-group">
                 <label for="languages">Programming languages <span class="optional">Optional</span></label>
-                <input type="text" id="languages" name="languages" placeholder="e.g. Python, MATLAB, C++" aria-describedby="languagesHint">
+                <input type="text" id="languages" name="languages" maxlength="500" placeholder="e.g. Python, MATLAB, C++" aria-describedby="languagesHint">
                 <p class="field-hint" id="languagesHint">Separate each language with a comma.</p>
               </div>
               <div class="input-group">
                 <label for="tools">Engineering software <span class="optional">Optional</span></label>
-                <input type="text" id="tools" name="tools" placeholder="e.g. SolidWorks, AutoCAD, Git" aria-describedby="toolsHint">
+                <input type="text" id="tools" name="tools" maxlength="500" placeholder="e.g. SolidWorks, AutoCAD, Git" aria-describedby="toolsHint">
                 <p class="field-hint" id="toolsHint">Separate each tool with a comma.</p>
               </div>
             </div>
@@ -181,11 +194,11 @@ export function renderBuilderHtml() {
             <div class="input-grid">
               <div class="input-group full-width">
                 <label for="projectTitle">Project name <span class="optional">Optional</span></label>
-                <input type="text" id="projectTitle" name="projectTitle" placeholder="e.g. A sensor dashboard for our student race car">
+                <input type="text" id="projectTitle" name="projectTitle" maxlength="180" placeholder="e.g. A sensor dashboard for our student race car">
               </div>
               <div class="input-group full-width">
                 <label for="projectSummary">What did you do? <span class="optional">Optional</span></label>
-                <textarea id="projectSummary" name="projectSummary" rows="4" placeholder="What was the problem? What did you build or contribute? What happened as a result?"></textarea>
+                <textarea id="projectSummary" name="projectSummary" maxlength="4000" rows="4" placeholder="What was the problem? What did you build or contribute? What happened as a result?"></textarea>
               </div>
             </div>
             <div class="transcript-box">
@@ -197,7 +210,7 @@ export function renderBuilderHtml() {
           </section>
           <p class="form-error" id="formError" role="alert" hidden></p>
           <div class="submit-area">
-            <p class="submit-copy">Your profile brings your studies, skills and project experience together.</p>
+            <p class="submit-copy">Your profile starts private. You can review it and choose to share it after signing up. <a href="/privacy" target="_blank" rel="noopener">See how your details are used.</a></p>
             <button type="submit" class="button" id="submitButton">Create my profile <span aria-hidden="true">↗</span></button>
           </div>
         </form>
@@ -217,40 +230,39 @@ export function renderBuilderHtml() {
       </aside>
     </div>
   </main>
-  <footer><div class="container footer-inner"><span>aigents.au · Engineering talent, amplified by AI.</span><a href="/">Back to home ↗</a></div></footer>
+  <footer><div class="container footer-inner"><span>aigents.au · Engineering talent, amplified by AI.</span><span class="footer-links"><a href="/privacy">Privacy</a><a href="/">Back to home ↗</a></span></div></footer>
   <div class="modal-backdrop" id="successModal">
     <section class="modal-box" role="dialog" aria-modal="true" aria-labelledby="successHeading" aria-describedby="modalSubtitle" tabindex="-1">
-      <button type="button" class="close-button" onclick="closeSuccessModal()" aria-label="Close confirmation">×</button>
       <div class="success-icon" aria-hidden="true">✓</div>
       <h2 id="successHeading">Your profile is created.</h2>
       <p id="modalSubtitle">Your submitted profile details have been saved.</p>
+      <div class="recovery-box">
+        <h3>Save your recovery code</h3>
+        <p>Keep this code in your password manager. You'll need it to reset a forgotten password. This is the only time it will be shown.</p>
+        <code id="recoveryCode" tabindex="0" aria-label="Your one-time recovery code"></code>
+      </div>
       <div class="saved-details">
         <p>Your submitted details</p>
         <dl><dt>Name</dt><dd id="savedName"></dd><dt>University</dt><dd id="savedUniversity"></dd><dt>Discipline</dt><dd id="savedDiscipline"></dd></dl>
       </div>
-      <a id="viewPortalBtn" href="/" class="button">Back to aigents.au <span aria-hidden="true">↗</span></a>
+      <a id="viewPortalBtn" href="/profile" class="button">View my profile <span aria-hidden="true">↗</span></a>
     </section>
   </div>
   <script>
     let selectedFileName = '';
     let submissionInProgress = false;
+    let profileCreated = false;
     let focusBeforeModal;
 
     function handleFileSelect(e) {
       selectedFileName = e.target.files && e.target.files[0] ? e.target.files[0].name : '';
+      e.target.setCustomValidity(selectedFileName.length > 200 ? 'Choose a document with a file name of 200 characters or fewer.' : '');
       document.getElementById('fileNameDisplay').textContent = selectedFileName ? 'File name selected: ' + selectedFileName : 'No document selected.';
     }
 
-    function closeSuccessModal() {
-      document.getElementById('successModal').style.display = 'none';
-      document.body.style.overflow = '';
-      if (focusBeforeModal) focusBeforeModal.focus();
-    }
-
     document.getElementById('successModal').addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') closeSuccessModal();
       if (e.key === 'Tab') {
-        const controls = this.querySelectorAll('button, a[href]');
+        const controls = this.querySelectorAll('button, a[href], [tabindex="0"]');
         const first = controls[0];
         const last = controls[controls.length - 1];
         if (e.shiftKey && (document.activeElement === first || document.activeElement.classList.contains('modal-box'))) {
@@ -265,12 +277,13 @@ export function renderBuilderHtml() {
 
     async function submitCandidate(e) {
       e.preventDefault();
-      if (submissionInProgress || !document.getElementById('builderForm').reportValidity()) return;
+      if (submissionInProgress || profileCreated || !document.getElementById('builderForm').reportValidity()) return;
       const button = document.getElementById('submitButton');
       const error = document.getElementById('formError');
       const payload = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
         university: document.getElementById('university').value,
         discipline: document.getElementById('discipline').value,
         atar: document.getElementById('atar').value,
@@ -293,8 +306,12 @@ export function renderBuilderHtml() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('Registration failed');
-        await res.json();
+        if (!res.ok) throw new Error(res.status === 409 ? 'This email already has an account. Sign in to continue.' : 'We couldn’t create your profile. Check your details and try again.');
+        const data = await res.json();
+        if (!data.profile || !data.recoveryCode) throw new Error('Your account response was incomplete. Try signing in to check whether your profile was created.');
+        profileCreated = true;
+        document.getElementById('password').value = '';
+        document.getElementById('recoveryCode').textContent = data.recoveryCode;
         document.getElementById('modalSubtitle').textContent = 'Thanks, ' + payload.name + '. Your submitted profile details have been saved.';
         document.getElementById('savedName').textContent = payload.name;
         document.getElementById('savedUniversity').textContent = payload.university;
@@ -303,12 +320,12 @@ export function renderBuilderHtml() {
         document.body.style.overflow = 'hidden';
         document.querySelector('#successModal .modal-box').focus();
       } catch (err) {
-        error.textContent = 'We couldn’t create your profile. Your entries are still here. Please try again.';
+        error.textContent = err.message || 'We couldn’t create your profile. Your entries are still here. Please try again.';
         error.hidden = false;
       } finally {
         submissionInProgress = false;
-        button.disabled = false;
-        button.innerHTML = 'Create my profile <span aria-hidden="true">↗</span>';
+        button.disabled = profileCreated;
+        button.innerHTML = profileCreated ? 'Profile created' : 'Create my profile <span aria-hidden="true">↗</span>';
         document.getElementById('builderForm').removeAttribute('aria-busy');
       }
     }

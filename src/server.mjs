@@ -4,9 +4,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { synthesizePortalBundle } from './engine/synthesizer.mjs';
 import { handleChatQuery } from './engine/chat.mjs';
-import { renderBuilderHtml } from './views/builder.mjs';
 import { renderApexLandingHtml } from './views/landing.mjs';
-import { registerCandidate } from './engine/candidate-manager.mjs';
+import { createStore } from './engine/store.mjs';
+import { Platform } from './engine/platform.mjs';
+import { createPlatformRoutes } from './platform-routes.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -514,10 +515,20 @@ function renderPortalHtml(bundle) {
 </html>`;
 }
 
-// Start Server
-loadData().then(({ candidate, jobs }) => {
+// All account writes use shared durable storage. Fail startup if it is unavailable.
+const platform = new Platform(createStore(), { teamAccessKey: process.env.TEAM_ACCESS_KEY });
+const platformRoutes = createPlatformRoutes(platform);
+Promise.all([loadData(), platform.ready()]).then(([{ candidate, jobs }]) => {
   const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, `http://${req.headers.host}`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    if (process.env.NODE_ENV === 'production') res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+    let url;
+    try { url = new URL(req.url, `http://${req.headers.host}`); }
+    catch { res.writeHead(400); res.end('Invalid request'); return; }
+    if (await platformRoutes(req, res, url)) return;
     const host = req.headers.host || '';
 
     // Extract slug from subdomain (e.g. minres.aigents.au)
@@ -568,32 +579,6 @@ loadData().then(({ candidate, jobs }) => {
       }
     }
 
-    // Student Fellowship CV/AIgent Studio
-    if (url.pathname === '/build') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(renderBuilderHtml());
-      return;
-    }
-
-    // Candidate Registration API
-    if (req.method === 'POST' && url.pathname === '/api/candidate/register') {
-      let bodyStr = '';
-      req.on('data', chunk => { bodyStr += chunk; });
-      req.on('end', async () => {
-        try {
-          const body = JSON.parse(bodyStr || '{}');
-          const registered = await registerCandidate(body);
-          res.writeHead(201, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(registered));
-        } catch (err) {
-          console.error('[aigents.au] Error registering candidate:', err);
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Failed to register candidate profile' }));
-        }
-      });
-      return;
-    }
-
     // 3. Render 1-Page PDF/HTML Printable Brief
     if (slug && jobs[slug] && isBrief) {
       const bundle = await synthesizePortalBundle(jobs[slug], candidate);
@@ -610,12 +595,22 @@ loadData().then(({ candidate, jobs }) => {
       return;
     }
 
-    // 5. Apex Landing Page (Guaranteed Wage Charter + Two-Sided Platform)
+    if (url.pathname !== '/' || req.method !== 'GET') {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Page not found');
+      return;
+    }
+    // Public homepage
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(renderApexLandingHtml(jobs, candidate));
   });
 
+  server.requestTimeout = 30000;
+  server.headersTimeout = 15000;
   server.listen(PORT, () => {
     console.log(`[aigents.au] Engine live on http://localhost:${PORT}`);
   });
+}).catch(error => {
+  console.error('[aigents.au] Startup failed:', error.name, error.code || error.message);
+  process.exitCode = 1;
 });
