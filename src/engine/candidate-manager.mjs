@@ -1,99 +1,36 @@
-/**
- * Candidate Profile Generator & Persistence
- * 
- * Takes form data from the /build studio, persists the candidate into data/candidates/[id].json,
- * and sets up their AIgent personality and workflow suite.
- */
-
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT_DIR = path.resolve(__dirname, '../..');
-
-export function slugify(name) {
-  return String(name || 'fellow')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+export class InputError extends Error {
+  constructor(message, status = 400) { super(message); this.status = status; }
 }
-
-export async function registerCandidate(formData) {
-  const name = formData.name || 'Anonymous Fellow';
-  const id = slugify(name);
-  const candidatePath = path.join(ROOT_DIR, 'data', 'candidates', `${id}.json`);
-
-  const candidateProfile = {
-    id: id,
-    name: name,
-    email: formData.email || '',
-    phone: formData.phone || '',
-    title: `AI-Tooled ${formData.discipline || 'Engineering'} Fellow`,
-    tier: formData.atar ? `ATAR ${formData.atar}` : `WAM ${formData.wam || '85+'}`,
-    status: "Active Fellow — Guaranteed Retainer Enrolled",
-    weeklyRetainer: "$750/week Base + $45–$55/hr Placement",
-    education: {
-      degree: formData.degree || 'Bachelor of Engineering (Honours)',
-      discipline: formData.discipline || 'Mechanical & Systems Engineering',
-      university: formData.university || 'University of Queensland',
-      graduationYear: formData.gradYear || '2026',
-      honours: "First Class Honours Track",
-      academicHighlights: [
-        formData.atar ? `ATAR ${formData.atar} (State Merit Rank)` : `Academic WAM ${formData.wam || '85+'}`,
-        "Dean's Commendation for Academic Excellence",
-        "Aigents.au Enterprise AI Workflow Fellow"
-      ]
-    },
-    transcriptSubmitted: true,
-    transcriptDocName: formData.transcriptName || 'Academic_Transcript_Verified.pdf',
-    submittedAt: new Date().toISOString(),
-    valueProposition: formData.bio || "High-horsepower analytical foundation paired with autonomous AI workflows to eliminate senior engineering drag from Day 1.",
-    aiWorkflowSuite: [
-      {
-        category: "Telemetry & Data Pipelines",
-        name: "Automated Anomaly & Telemetry Parsing",
-        description: "Python + Polars data pipelines augmented with agentic anomaly detection to wrangle dirty sensor logs and time-series data without manual data cleaning drag.",
-        tools: ["Python", "Polars", "Pandas", "DuckDB", "Agentic Pipelines"]
-      },
-      {
-        category: "Standards & Compliance",
-        name: "Sovereign Regulatory & Standards RAG",
-        description: "Vectorised regulatory database over AS/NZS, ISO, and site-specific safety standards for instant clause retrieval, cross-referencing, and automated compliance auditing.",
-        tools: ["Vector RAG", "Embedding Search", "Australian Standards (AS/NZS)", "ISO Standards"]
-      },
-      {
-        category: "Simulation & Modeling",
-        name: "Agentic Code Loops & Digital Twins",
-        description: "AI-assisted parameter sweeps, finite element analysis (FEA) verification scripts, and automated test harness generation.",
-        tools: ["MATLAB", "Python", "CAD Automation", "Automated Testing"]
-      },
-      {
-        category: "Operational PMO & Reporting",
-        name: "Voice-to-Task & Shift Handoff Synthesis",
-        description: "Automated transcription and structured action-item extraction from technical discussions, auto-updating Jira/project risk registers.",
-        tools: ["Whisper", "Structured JSON Extraction", "Project Controls", "HAZOP/FMEA Logs"]
-      }
-    ],
-    technicalSkills: {
-      languages: (formData.languages || "Python, MATLAB, SQL, C++").split(',').map(s => s.trim()),
-      engineeringTools: (formData.tools || "SolidWorks, CAD, FEA, Git").split(',').map(s => s.trim()),
-      aiTooling: ["Agentic Coding Loops", "Standards Vector RAG", "Prompt Harnessing", "Function Calling", "Local Embeddings"]
-    },
-    proofProjects: [
-      {
-        name: formData.projectTitle || "Automated Engineering Telemetry & Diagnostics Pipeline",
-        summary: formData.projectSummary || "Engineered an automated data pipeline and agentic parser to clean raw sensor logs, detect anomalies, and auto-generate compliance summaries.",
-        impact: "Absorbs 15+ hours per week of manual senior engineering data wrangling."
-      }
-    ],
-    contact: {
-      availability: "Immediate / Vacation / Semester Co-op",
-      location: formData.location || "Brisbane / Gold Coast / WA Fly-In Fly-Out"
-    }
-  };
-
-  await fs.writeFile(candidatePath, JSON.stringify(candidateProfile, null, 2), 'utf8');
-  return candidateProfile;
+export function textField(body, field, max, required = false) {
+  const value = body[field] ?? '';
+  if (typeof value !== 'string' || value.length > max || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(value)) throw new InputError(`Check the ${field} field.`);
+  const clean = value.trim();
+  if (required && !clean) throw new InputError(`Please complete the ${field} field.`);
+  return clean;
 }
+export function normalizeEmail(value) {
+  if (typeof value !== 'string' || value.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) throw new InputError('Enter a valid email address.');
+  return value.trim().toLowerCase();
+}
+export function normalizeProfile(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw new InputError('Enter your profile details.');
+  const profile = {};
+  const limits = { name: 100, university: 150, discipline: 100, wam: 40, atar: 20, languages: 500, tools: 500, projectTitle: 180, projectSummary: 4000, transcriptName: 200, bio: 1500, location: 180, availability: 300 };
+  for (const [field, max] of Object.entries(limits)) profile[field] = textField(body, field, max, ['name', 'university', 'discipline', 'wam'].includes(field));
+  if (body.sharingEnabled !== undefined && typeof body.sharingEnabled !== 'boolean') throw new InputError('Choose whether to share your profile.');
+  profile.sharingEnabled = body.sharingEnabled === true;
+  return profile;
+}
+export function publicProfile(profile) {
+  return Object.fromEntries(['id', 'name', 'university', 'discipline', 'languages', 'tools', 'projectTitle', 'projectSummary', 'bio', 'location', 'availability', 'updatedAt'].map(field => [field, profile[field] || '']));
+}
+export function normalizeEnquiry(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw new InputError('Enter your project details.');
+  if (body.consent !== true) throw new InputError('Please agree to share this enquiry with Aigents and the selected student.');
+  if (body.website) throw new InputError('Unable to submit this enquiry.');
+  const enquiry = { email: normalizeEmail(body.email) };
+  const limits = { company: 180, contactName: 100, projectTitle: 180, description: 5000, skills: 1000, location: 180, budget: 180, timeline: 180 };
+  for (const [field, max] of Object.entries(limits)) enquiry[field] = textField(body, field, max, ['company', 'contactName', 'projectTitle', 'description'].includes(field));
+  return enquiry;
+}
+export function slugify(name) { return String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }

@@ -111,15 +111,15 @@ ${portalUrl}`;
   const interactiveQna = [
     {
       question: `How does ${candidate.name} provide immediate value to ${company.name}'s ${role.department} team without senior hand-holding?`,
-      answer: `${candidate.name} arrives equipped with production-grade AI workflow harnesses (including Python/Polars telemetry pipelines and standards RAG). Instead of spending weeks asking senior engineers where documentation or baseline scripts are, Kate uses agentic tools to ingest codebase specs and synthesize data, escalating only true first-principles engineering decisions.`
+      answer: `${candidate.name} arrives equipped with production-grade AI workflow harnesses (including Python/Polars telemetry pipelines and standards RAG). Instead of spending weeks asking senior engineers where documentation or baseline scripts are, ${candidate.name} uses agentic tools to ingest codebase specs and synthesize data, escalating only true first-principles engineering decisions.`
     },
     {
       question: `What specific tools and frameworks does ${candidate.name} bring for telemetry and sensor data?`,
-      answer: `Kate utilizes automated Python, Polars, and DuckDB ingestion scripts augmented with anomaly detection models. In past project work, this pipeline processed 500k+ sensor points/sec for heavy rotating equipment, cutting diagnostic time by 80%.`
+      answer: `${candidate.name} utilizes automated Python, Polars, and DuckDB ingestion scripts augmented with anomaly detection models. In past project work, this pipeline processed 500k+ sensor points/sec for heavy rotating equipment, cutting diagnostic time by 80%.`
     },
     {
       question: `How does ${candidate.name} handle Australian Standards and safety compliance?`,
-      answer: `Rather than manually leafing through hundreds of pages of AS/NZS standards, Kate leverages a sovereign, local vector RAG database to query relevant clauses, cross-reference design constraints, and produce verified, citation-backed audit trails in minutes.`
+      answer: `Rather than manually leafing through hundreds of pages of AS/NZS standards, ${candidate.name} leverages a sovereign, local vector RAG database to query relevant clauses, cross-reference design constraints, and produce verified, citation-backed audit trails in minutes.`
     },
     {
       question: `What is the proposed engagement structure for this placement?`,
