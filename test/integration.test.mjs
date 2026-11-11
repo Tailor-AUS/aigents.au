@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import fs from 'node:fs/promises';
+import http from 'node:http';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
@@ -87,7 +88,18 @@ async function harness() {
     }
     return { response, status: response.status, text, data };
   }
-  return { base, request, start, stop, async close() {
+  function hostRequest(hostHeader, route = '/', method = 'GET') {
+    return new Promise((resolve, reject) => {
+      const req = http.request({ host: '127.0.0.1', port, path: route, method, headers: { Host: hostHeader } }, res => {
+        const chunks = [];
+        res.on('data', chunk => chunks.push(chunk));
+        res.on('end', () => resolve({ status: res.statusCode, text: Buffer.concat(chunks).toString('utf8'), headers: res.headers }));
+      });
+      req.on('error', reject);
+      req.end();
+    });
+  }
+  return { base, request, hostRequest, start, stop, async close() {
     await stop();
     assert.ok(path.resolve(dataDir).startsWith(path.join(path.resolve(os.tmpdir()), 'aigents-http-test-')), 'cleanup must stay within this test temporary directory');
     await fs.rm(dataDir, { recursive: true, force: true });
@@ -125,6 +137,15 @@ test('HTTP student and employer journeys remain secure and durable across a serv
     expectStatus(await request(retired), 404, `retired company pitch route ${retired}`);
   }
   expectStatus(await request('/api/chat', { method: 'POST', body: { slug: 'macmahon', query: 'telemetry' } }), 404, 'retired company pitch chat endpoint');
+  for (const retiredHost of ['macmahon.aigents.au', 'minres.aigents.au', 'apex-energy.aigents.au', 'sundrive.aigents.au', 'macmahon.aigents.au.']) {
+    expectStatus(await app.hostRequest(retiredHost, '/', 'GET'), 404, `retired host GET / (${retiredHost})`);
+    expectStatus(await app.hostRequest(retiredHost, '/', 'HEAD'), 404, `retired host HEAD / (${retiredHost})`);
+    expectStatus(await app.hostRequest(retiredHost, '/build', 'GET'), 404, `retired host GET /build (${retiredHost})`);
+  }
+  for (const allowedHost of ['aigents.au', 'www.aigents.au', 'aigents-web.thankfulfield-28a3a0bf.australiaeast.azurecontainerapps.io']) {
+    expectStatus(await app.hostRequest(allowedHost, '/', 'GET'), 200, `allowed host GET / (${allowedHost})`);
+    expectStatus(await app.hostRequest(allowedHost, '/build', 'GET'), 200, `allowed host GET /build (${allowedHost})`);
+  }
   expectStatus(await request('/api/profile'), 401, 'anonymous private profile read');
   expectStatus(await request('/api/profile', { method: 'PATCH', body: studentInput() }), 401, 'anonymous profile edit');
   expectStatus(await request('/api/team/enquiries'), 401, 'anonymous team inbox');

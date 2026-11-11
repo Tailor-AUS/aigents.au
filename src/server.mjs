@@ -22,6 +22,13 @@ platform.ready().then(() => {
     try { url = new URL(req.url, `http://${req.headers.host}`); }
     catch { res.writeHead(400); res.end('Invalid request'); return; }
 
+    const hostname = url.hostname.toLowerCase().replace(/\.$/, '');
+    if (hostname.endsWith('.aigents.au') && hostname !== 'www.aigents.au') {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(req.method === 'HEAD' ? undefined : 'Page not found');
+      return;
+    }
+
     if (await platformRoutes(req, res, url)) return;
 
     if (url.pathname !== '/' || (req.method !== 'GET' && req.method !== 'HEAD')) {
