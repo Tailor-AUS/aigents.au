@@ -118,7 +118,13 @@ test('HTTP student and employer journeys remain secure and durable across a serv
     expectStatus(page, 200, `load ${route}`);
     assert.match(page.response.headers.get('content-type'), /text\/html/i);
     assert.match(page.text, /aigents/i);
+    assert.doesNotMatch(page.text, /kate|corcoran|macmahon|minres|sundrive|apex-energy|\/p\/|#examples/i);
   }
+  expectStatus(await request('/', { method: 'HEAD' }), 200, 'HEAD /');
+  for (const retired of ['/p/macmahon', '/p/minres', '/p/apex-energy', '/p/sundrive', '/p/macmahon/brief', '/portal/macmahon', '/api/packet/macmahon']) {
+    expectStatus(await request(retired), 404, `retired company pitch route ${retired}`);
+  }
+  expectStatus(await request('/api/chat', { method: 'POST', body: { slug: 'macmahon', query: 'telemetry' } }), 404, 'retired company pitch chat endpoint');
   expectStatus(await request('/api/profile'), 401, 'anonymous private profile read');
   expectStatus(await request('/api/profile', { method: 'PATCH', body: studentInput() }), 401, 'anonymous profile edit');
   expectStatus(await request('/api/team/enquiries'), 401, 'anonymous team inbox');

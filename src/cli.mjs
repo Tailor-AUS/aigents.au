@@ -11,7 +11,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 async function main() {
   const [command, slug] = process.argv.slice(2);
 
-  const candidatePath = path.join(ROOT_DIR, 'data', 'candidates', 'kate-corcoran.json');
+  const candidatePath = path.join(ROOT_DIR, 'data', 'candidates', 'jordan-miller.json');
   const candidate = JSON.parse(await fs.readFile(candidatePath, 'utf8'));
 
   const jobsDir = path.join(ROOT_DIR, 'data', 'jobs');

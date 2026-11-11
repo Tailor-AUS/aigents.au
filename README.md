@@ -6,7 +6,7 @@ A Node.js application for engineering student profiles and employer project enqu
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Public homepage and illustrative engineering role examples. |
+| `/` | Public homepage for engineering students and employers. |
 | `/build` | Create a student account and private profile. Successful signup displays a recovery code. |
 | `/signin` | Student email/password sign-in. |
 | `/profile` | Authenticated profile editing, sharing settings and the student's enquiry inbox. |
@@ -21,8 +21,6 @@ A Node.js application for engineering student profiles and employer project enqu
 Profiles are **private by default**. Sharing is an explicit setting saved with the profile. Public views exclude the student's email, grades and transcript filename. Turning sharing off makes the public page and public API unavailable. Academic transcript handling stores a filename reference only; it does not upload or verify the document.
 
 The account email currently cannot be changed. There are no automatic confirmation, enquiry-notification or password-reset emails. Students and operators must sign in to check their inboxes; contact details enable manual follow-up. An enquiry is a saved request, not a booking, a guaranteed placement or a payment agreement.
-
-The existing `/p/{slug}` and `/portal/{slug}` company examples use the legacy seed data in `data/`. They remain separate from registered student accounts and do not represent a live directory of applicants or confirmed employer partnerships.
 
 ## Local development
 
